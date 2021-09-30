@@ -139,14 +139,20 @@ def isvalid_date(date):
     except ValueError:
         return False
 
-def validate_dinning_suggestion(cuisine, number_of_people, date, time, email):
+def validate_dinning_suggestion(location, cuisine, number_of_people, date, time, email):
+    
+    if location is not None:
+        if not location['value']['resolvedValues']:
+            return build_validation_result(False,'Location','Please provide a valid city such as NYC or Boston')
+    
     cuisine_types = ["American", "Chinese", "Indian", "Italian", "Korean"]
     if cuisine is not None:
-        cuisine = cuisine['value']['resolvedValues'][0]
-        if cuisine not in cuisine_types:
+        if not cuisine['value']['resolvedValues'] or cuisine['value']['resolvedValues'][0] not in cuisine_types:
             return build_validation_result(False,'Cuisine','Please select a cuisine style from following: American, Chinese, Indian, Italian, Korean')
     
     if number_of_people is not None:
+        if not number_of_people['value']['resolvedValues']:
+            return build_validation_result(False, 'NumberOfPeople', "Please provide a valid number such as 2 or 10")
         num = parse_int(number_of_people['value']['resolvedValues'][0])
         if math.isnan(num):
             return build_validation_result(False, 'NumberOfPeople', 'Please enter a valid number.')
@@ -154,6 +160,8 @@ def validate_dinning_suggestion(cuisine, number_of_people, date, time, email):
             return build_validation_result(False, 'NumberOfPeople', 'I can suggest a restaurant from 1 person to 20 people. Can you specify a number in this range?')
 
     if date is not None:
+        if not date['value']['resolvedValues']:
+            return build_validation_result(False, 'Date', "Please provide a valid date such as today or 9/30")
         date = date['value']['resolvedValues'][0]
         if not isvalid_date(date):
             return build_validation_result(False, 'Date', 'I did not understand that, what date would you like to dine?')
@@ -161,6 +169,8 @@ def validate_dinning_suggestion(cuisine, number_of_people, date, time, email):
             return build_validation_result(False, 'Date', 'I can suggest a restaurant for you from today.  What day would you like to reserve?')
 
     if time is not None:
+        if not time['value']['resolvedValues']:
+            return build_validation_result(False, 'Time', "Please provide a valid time such as 6pm or 18:00")
         time = time['value']['resolvedValues'][0]
         if len(time) != 5:
             return build_validation_result(False, 'Time', None)
@@ -177,7 +187,7 @@ def validate_dinning_suggestion(cuisine, number_of_people, date, time, email):
             return build_validation_result(False, 'Time', 'Can you specify a time that greater than the current time ({}:{})?'.format(current_hour,current_minute))
             
     if email is not None:
-        if email['value']['resolvedValues'] == []:
+        if not email['value']['resolvedValues']:
             return build_validation_result(False, "Email", 'Please provide a valid email.')
         email = email['value']['resolvedValues'][0]
         if '@' not in email:
@@ -208,7 +218,7 @@ def dinning_suggestion(intent_name, intent_request):
         # Use the elicitSlot dialog action to re-prompt for the first violation detected.
         slots = get_slots(intent_request)
 
-        validation_result = validate_dinning_suggestion(cuisine, number_of_people, date, time, email)
+        validation_result = validate_dinning_suggestion(location, cuisine, number_of_people, date, time, email)
         if not validation_result['isValid']:
             slots[validation_result['violatedSlot']] = None
             return elicit_slot(
@@ -259,7 +269,7 @@ def dispatch(intent_request):
         )
 
     raise Exception('Intent with name ' + intent_name + ' not supported')
-    
+
 
 def lambda_handler(event, context):
     """

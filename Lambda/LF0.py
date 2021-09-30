@@ -15,7 +15,7 @@ def lambda_handler(event, context):
     return {
         'statusCode': 200,
         'body': response,
-        'messages': [{"type":"unstructured","unstructured":{"text":response['messages'][0]['content']}}],
+        'messages': response['messages'][0]['content'],
         'headers': {
             'Access-Control-Allow-Headers' : 'Content-Type',
             'Access-Control-Allow-Origin': '*',
