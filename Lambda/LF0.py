@@ -1,0 +1,24 @@
+import json
+import boto3
+import logging
+
+def lambda_handler(event, context):
+    client = boto3.client('lexv2-runtime')
+    
+    response = client.recognize_text(
+        botId='YEOQVWAGBZ',
+        botAliasId='TSTALIASID',
+        localeId='en_US',
+        sessionId='lf0',
+        text=event["messages"][0]["unstructured"]['text'])
+        
+    return {
+        'statusCode': 200,
+        'body': response,
+        'messages': [{"type":"unstructured","unstructured":{"text":response['messages'][0]['content']}}],
+        'headers': {
+            'Access-Control-Allow-Headers' : 'Content-Type',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+        },
+    }
