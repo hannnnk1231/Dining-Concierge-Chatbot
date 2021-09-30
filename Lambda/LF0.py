@@ -10,7 +10,7 @@ def lambda_handler(event, context):
         botAliasId='TSTALIASID',
         localeId='en_US',
         sessionId='lf0',
-        text=event["messages"][0]["unstructured"]['text'])
+        text=event["messages"])
         
     return {
         'statusCode': 200,
