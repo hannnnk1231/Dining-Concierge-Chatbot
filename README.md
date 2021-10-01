@@ -1,8 +1,8 @@
-# Dinning-Concierge-Chatbot
+# Dining-Concierge-Chatbot
 
 # Demo
 
-Try our dinning concierge chatbot [here](http://diningconciergechatbot.com.s3-website-us-east-1.amazonaws.com/)!
+Try our dining concierge chatbot [here](http://diningconciergechatbot.com.s3-website-us-east-1.amazonaws.com/)!
 
 # Description
 

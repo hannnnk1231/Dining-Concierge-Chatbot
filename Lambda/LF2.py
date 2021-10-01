@@ -48,7 +48,7 @@ def send_email(email, msg):
                 },
                 "Subject": {
                     "Charset": CHARSET,
-                    "Data": "Your Dinning Suggestion",
+                    "Data": "Your Dining Suggestion",
                 },
             },
             Source="mh6069@nyu.edu",

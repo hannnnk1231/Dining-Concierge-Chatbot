@@ -5,6 +5,7 @@ import time
 import os
 import logging
 import boto3
+from boto3.dynamodb.conditions import Attr
 
 
 logger = logging.getLogger()
@@ -56,8 +57,11 @@ def push_message(intent_request):
             }
         }
         )
-
-
+        
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('dining_user')
+    table.put_item(Item = {'uid':intent_request['sessionId'], "cuisine":cuisine, "location":location})
+    
 def get_slots(intent_request):
     return intent_request['sessionState']['intent']['slots']
 
@@ -110,6 +114,24 @@ def delegate(intent_name, slots):
             }
         }
     }
+    
+
+def confirm_intent(intent_name, slots, message):
+    return {
+        "sessionState": {
+            'dialogAction': {
+                'type': "ConfirmIntent",
+            },
+            'intent': {
+                "name": intent_name,
+                'slots': slots
+            }
+        },
+        'messages': [{
+            'contentType': 'PlainText',
+            'content': message
+        }]
+    }
 
 def parse_int(n):
     try:
@@ -139,7 +161,7 @@ def isvalid_date(date):
     except ValueError:
         return False
 
-def validate_dinning_suggestion(location, cuisine, number_of_people, date, time, email):
+def validate_dining_suggestion(location, cuisine, number_of_people, date, time, email):
     
     if location is not None:
         if not location['value']['resolvedValues']:
@@ -196,9 +218,9 @@ def validate_dinning_suggestion(location, cuisine, number_of_people, date, time,
     return build_validation_result(True, None, None)
 
 
-def dinning_suggestion(intent_name, intent_request):
+def dining_suggestion(intent_name, intent_request):
     """
-    Performs dialog management and fulfillment for dinning suggestion.
+    Performs dialog management and fulfillment for dining suggestion.
     Beyond fulfillment, the implementation of this intent demonstrates the use of the elicitSlot dialog action
     in slot validation and re-prompting.
     """
@@ -218,7 +240,7 @@ def dinning_suggestion(intent_name, intent_request):
         # Use the elicitSlot dialog action to re-prompt for the first violation detected.
         slots = get_slots(intent_request)
 
-        validation_result = validate_dinning_suggestion(location, cuisine, number_of_people, date, time, email)
+        validation_result = validate_dining_suggestion(location, cuisine, number_of_people, date, time, email)
         if not validation_result['isValid']:
             slots[validation_result['violatedSlot']] = None
             return elicit_slot(
@@ -243,12 +265,49 @@ def dinning_suggestion(intent_name, intent_request):
     )
 
 
+def return_user(intent_name, intent_request):
+    slots = get_slots(intent_request)
+    source = intent_request['invocationSource']
+    userid = intent_request['sessionId']
+    if source == "DialogCodeHook":
+        dynamodb = boto3.resource('dynamodb')
+        table = dynamodb.Table('dining_user')
+        uid = intent_request['sessionId']
+        response = table.scan(FilterExpression=Attr('uid').eq(uid))
+        info = response["Items"]
+        if info:
+            info = info[0]
+            location, cuisine = info['location'], info['cuisine']
+            slots['Cuisine'] = {'value': {
+                  "originalValue": cuisine,
+                  "interpretedValue": cuisine,
+                  "resolvedValues": [cuisine]
+            }}
+            slots['Location'] = {'value': {
+                  "originalValue": location,
+                  "interpretedValue": location,
+                  "resolvedValues": [location]
+            }}
+            msg = "Hi, you ask for {Location}'s {Cuisine} style restaurant last time. Do you want to continue with the same cuisine style and the same location?".format(Location=location, Cuisine=cuisine)
+            return confirm_intent("DiningSuggestionIntent", slots, msg)
+        else:
+            return close(intent_name, 'Fulfilled', {'contentType':'PlainText', 'content':'Hi there, how can I help?'})
+
 def dispatch(intent_request):
-
     intent_name = intent_request['sessionState']['intent']['name']
-
-    if intent_name == 'DinningSuggestionIntent':
-        return dinning_suggestion(intent_name, intent_request)
+    
+    if intent_request['sessionState']['intent']['confirmationState']=='Denied':
+        return close(
+            intent_name,
+            'Fulfilled',
+            {
+                'contentType': 'PlainText',
+                'content': 'Well, how can I help?'
+            }
+        )
+    
+    elif intent_name == 'DiningSuggestionIntent':
+        return dining_suggestion(intent_name, intent_request)
     elif intent_name == 'GreetingIntent':
         return close(
             intent_name,
@@ -267,7 +326,9 @@ def dispatch(intent_request):
                 'content': "You're welcome, have a nice day."
             }
         )
-
+    elif intent_name == "ReturnUserIntent":
+        return return_user(intent_name, intent_request)
+    
     raise Exception('Intent with name ' + intent_name + ' not supported')
 
 

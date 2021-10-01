@@ -9,7 +9,7 @@ def lambda_handler(event, context):
         botId='YEOQVWAGBZ',
         botAliasId='TSTALIASID',
         localeId='en_US',
-        sessionId='lf0',
+        sessionId=event["uid"],
         text=event["messages"])
         
     return {

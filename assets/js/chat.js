@@ -4,10 +4,18 @@ $(document).ready(function() {
   var $messages = $('.messages-content'),
     d, h, m,
     i = 0;
-
+  
   $(window).load(function() {
     $messages.mCustomScrollbar();
-    insertResponseMessage('Hi there, I\'m your personal Concierge. How can I help?');
+    if ($.cookie('uuid')){
+      callChatbotApi("return").then((response) => {
+        var data = response.data;
+          insertResponseMessage(data.messages);
+      });
+    } else {
+      $.cookie('uuid', Math.random().toString(36));
+      insertResponseMessage('Hi there, I\'m your personal Concierge. How can I help?');
+    }
   });
 
   function updateScrollbar() {
@@ -28,7 +36,8 @@ $(document).ready(function() {
   function callChatbotApi(message) {
     // params, body, additionalParams
     return sdk.chatbotPost({}, {
-      messages: message
+      messages: message,
+      uid: $.cookie('uuid')
     }, {});
   }
 
@@ -50,7 +59,7 @@ $(document).ready(function() {
         if (data.messages && data.messages.length > 0) {
           console.log('received ' + data.messages.length + ' messages');
 
-          insertResponseMessage(data.messages)
+          insertResponseMessage(data.messages);
   
         } else {
           insertResponseMessage('Oops, something went wrong. Please try again.');
