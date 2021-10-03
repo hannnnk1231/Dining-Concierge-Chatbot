@@ -11,7 +11,7 @@ logger.setLevel(logging.DEBUG)
 
 region = 'us-east-1'
 service = 'es'
-HOST = "https://search-dinningconcierge-7jazrt3icqbzgkc35r4n5tdvfm.us-east-1.es.amazonaws.com/"
+HOST = "https://search-dining-concierge-jddhnyt5wuyuzj4gzsqpqbhwni.us-east-1.es.amazonaws.com/"
 SQSURL = "https://sqs.us-east-1.amazonaws.com/863570438364/DiningConciergeSQS"
 credentials = boto3.Session().get_credentials()
 awsauth = AWS4Auth(credentials.access_key, credentials.secret_key, region, service, session_token=credentials.token)
