@@ -142,7 +142,9 @@ def lambda_handler(event, context):
         if not send_email(email, msg): return
     
         sns_client = boto3.client('sns', region_name= 'us-east-1')
-        sns_client.publish(PhoneNumber='+1'+phone, Message=msg)
+        if phone and phone[0]!='+':
+            phone = '+1'+phone
+        sns_client.publish(PhoneNumber=phone, Message=msg)
         
         delete_message(message['ReceiptHandle'])
             
