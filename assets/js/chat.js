@@ -10,7 +10,16 @@ $(document).ready(function() {
     if ($.cookie('uuid')){
       callChatbotApi("return").then((response) => {
         var data = response.data;
+        if (data.messages && data.messages.length > 0) {
+          console.log('received ' + data.messages.length + ' messages');
           insertResponseMessage(data.messages);
+        } else {
+          console.log('not received');
+          insertResponseMessage('Hi there, I\'m your personal Concierge. How can I help?');
+        }
+      }).catch((error) => {
+        console.log('an error occurred', error);
+        insertResponseMessage('Oops, something went wrong. Please try again.');
       });
     } else {
       $.cookie('uuid', Math.random().toString(36));
