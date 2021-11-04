@@ -204,7 +204,7 @@ def validate_dining_suggestion(location, cuisine, number_of_people, date, time, 
             return build_validation_result(False, 'Time', None)
         current_time = datetime.datetime.now()
         current_hour, current_minute = current_time.hour, current_time.minute
-        if hour <= current_hour and minute <= current_minute:
+        if datetime.datetime.strptime(date, '%Y-%m-%d').date() == datetime.date.today() and hour <= current_hour and minute <= current_minute:
             # Lesser than the current time
             return build_validation_result(False, 'Time', 'Can you specify a time that greater than the current time ({}:{})?'.format(current_hour,current_minute))
             
