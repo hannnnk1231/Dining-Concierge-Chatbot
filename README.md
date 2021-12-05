@@ -12,21 +12,16 @@ In this task I implemented a serverless, microservice-driven web application. Sp
 
 # Usage
 > First time user
-
-![](img/image.jpeg)
+<img src="img/image.jpeg" width="50%">
 
 > Returned user
-
-![](img/image2.png)
+<img src="img/image2.png" width="50%">
 
 > SNS
-
-![](img/sns.jpg)
+<img src="img/sns.jpg" width="30%">
 
 > E-mail
-
-![](img/email.png)
+<img src="img/email.png" width="50%">
 
 # Architecture
-
-![](img/architecture.png)
+<img src="img/architecture.png" width="70%">
