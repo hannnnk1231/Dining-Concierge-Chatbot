@@ -2,8 +2,12 @@
 
 # Demo
 
-Try our dining concierge chatbot [here](http://diningconciergechatbot.com.s3-website-us-east-1.amazonaws.com/)!
+Dining concierge chatbot live demo [here](https://youtu.be/7EnJeuZdgwk)!
 
 # Description
 
 Fall 21 NYU Cloud Computing HW 1
+
+# Usage
+
+# Architecture
