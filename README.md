@@ -15,8 +15,18 @@ In this task I implemented a serverless, microservice-driven web application. Sp
 
 ![](img/image.jpeg)
 
-> Old user
+> Returned user
 
 ![](img/image2.png)
+
+> SNS
+
+![](img/sns.jpg)
+
+> E-mail
+
+![](img/email.png)
+
 # Architecture
+
 ![](img/architecture.png)
